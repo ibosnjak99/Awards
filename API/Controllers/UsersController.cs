@@ -10,7 +10,7 @@ namespace API.Controllers
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
-    public class UsersController : ControllerBase
+    public class UsersController
     {
         private readonly IUsersService usersService;
 

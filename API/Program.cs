@@ -1,18 +1,24 @@
 using Application;
 using DAL;
 using Microsoft.Data.SqlClient;
+using Serilog;
 using System.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddAutoMapper(typeof(MapperProfile));
 builder.Services.RegisterApplicationDependencies();
 builder.Services.RegisterDALDependencies();
+
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.File("Logs/Awards.txt", rollingInterval: RollingInterval.Day)
+    .CreateLogger();
+
+builder.Services.AddSingleton(Log.Logger);
 
 builder.Services.AddScoped<IDbConnection>(sp =>
 {

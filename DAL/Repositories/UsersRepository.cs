@@ -1,8 +1,8 @@
 ﻿using DAL.Repositories.Interfaces;
 using Dapper;
 using Domain;
+using Serilog;
 using System.Data;
-using System.Data.Common;
 
 namespace DAL
 {
@@ -12,10 +12,15 @@ namespace DAL
     public class UsersRepository : IUsersRepository
     {
         private readonly IDbConnection dbConnection;
+        private readonly ILogger logger;
 
-        public UsersRepository(IDbConnection dbConnection)
+        /// <summary>Initializes a new instance of the <see cref="UsersRepository" /> class.</summary>
+        /// <param name="dbConnection">The database connection.</param>
+        /// <param name="logger">The logger.</param>
+        public UsersRepository(IDbConnection dbConnection, ILogger logger)
         {
             this.dbConnection = dbConnection;
+            this.logger = logger;
         }
 
         /// <summary>
@@ -25,21 +30,29 @@ namespace DAL
         /// <returns>The user object.</returns>
         public async Task<User> RegisterUserAsync(User user)
         {
-            var sql = @"
-            INSERT INTO Users (FirstName, LastName, RegistrationDate)
-            VALUES (@FirstName, @LastName, @RegistrationDate);
-            SELECT CAST(SCOPE_IDENTITY() as int);"
-            ;
-
-            var userPid = await dbConnection.QuerySingleAsync<int>(sql, new
+            try
             {
-                user.FirstName,
-                user.LastName,
-                user.RegistrationDate
-            });
+                var sql = @"
+                INSERT INTO Users (FirstName, LastName, RegistrationDate)
+                VALUES (@FirstName, @LastName, @RegistrationDate);
+                SELECT CAST(SCOPE_IDENTITY() as int);";
 
-            user.PID = userPid;
-            return user;
+                var userPid = await dbConnection.QuerySingleAsync<int>(sql, new
+                {
+                    user.FirstName,
+                    user.LastName,
+                    user.RegistrationDate
+                });
+
+                user.PID = userPid;
+                this.logger.Information("Registered user {@User}", user);
+                return user;
+            }
+            catch (Exception ex)
+            {
+                this.logger.Error(ex, "Error registering user {@User}", user);
+                throw;
+            }
         }
 
         /// <summary>
@@ -48,8 +61,19 @@ namespace DAL
         /// <returns>All users.</returns>
         public async Task<IEnumerable<User>> GetAllUsersAsync()
         {
-            var sql = "SELECT * FROM Users";
-            return await dbConnection.QueryAsync<User>(sql);
+            try
+            {
+                var sql = "SELECT * FROM Users";
+                var users = await dbConnection.QueryAsync<User>(sql);
+
+                this.logger.Information("Retrieved all users");
+                return users;
+            }
+            catch (Exception ex)
+            {
+                this.logger.Error(ex, "Error retrieving all users");
+                throw;
+            }
         }
 
         /// <summary>
@@ -59,14 +83,24 @@ namespace DAL
         /// <returns>The user object.</returns>
         public async Task<User> GetUserByIdAsync(int id)
         {
-            var sql = "SELECT * FROM Users WHERE PID = @Id";
-
-            var user = await dbConnection.QuerySingleOrDefaultAsync<User>(sql, new { Id = id });
-            if (user == null)
+            try
             {
-                throw new KeyNotFoundException($"User with specified id {id} does not exist.");
+                var sql = "SELECT * FROM Users WHERE PID = @Id";
+
+                var user = await dbConnection.QuerySingleOrDefaultAsync<User>(sql, new { Id = id });
+                if (user == null)
+                {
+                    throw new KeyNotFoundException($"User with specified id {id} does not exist.");
+                }
+
+                this.logger.Information("Retrieved user with id {Id}", id);
+                return user;
             }
-            return user;
+            catch (Exception ex)
+            {
+                this.logger.Error(ex, "Error retrieving user with id {Id}", id);
+                throw;
+            }
         }
     }
 }

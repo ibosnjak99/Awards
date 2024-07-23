@@ -1,4 +1,5 @@
-﻿using DAL.Repositories.Interfaces;
+﻿using DAL.Repositories;
+using DAL.Repositories.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DAL
@@ -13,6 +14,7 @@ namespace DAL
         public static void RegisterDALDependencies(this IServiceCollection services)
         {
             services.AddScoped<IUsersRepository, UsersRepository>();
+            services.AddScoped<IAwardsRepository, AwardsRepository>();
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Application.Dtos;
 using AutoMapper;
 using Domain;
+using Domain.Models;
 
 namespace Application
 {
@@ -15,6 +16,7 @@ namespace Application
             CreateMap<User, UserDto>();
             CreateMap<RegisterUserDto, User>();
             CreateMap<UserDto, User>();
+            CreateMap<AwardCreateDto, Award>();
         }
     }
 }
