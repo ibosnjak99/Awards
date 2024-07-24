@@ -26,5 +26,12 @@ namespace DAL.Repositories.Interfaces
         /// All users.
         /// </returns>
         Task<IEnumerable<User>> GetAllUsersAsync();
+
+        /// <summary>Gets the users by registration date asynchronous.</summary>
+        /// <param name="date">The date.</param>
+        /// <returns>
+        /// Users registered on specified date.
+        /// </returns>
+        Task<IEnumerable<User>> GetUsersByRegistrationDateAsync(DateTime date);
     }
 }

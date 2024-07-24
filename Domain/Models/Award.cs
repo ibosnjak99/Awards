@@ -40,11 +40,19 @@ namespace Domain.Models
         public PeriodType PeriodType { get; set; }
 
         /// <summary>
-        /// Gets or sets the date created.
+        /// Gets or sets the start date.
         /// </summary>
         /// <value>
-        /// The cate created.
+        /// The start date.
         /// </value>
-        public DateTime DateCreated { get; set; }
+        public DateTime StartDate { get; set; }
+
+        /// <summary>
+        /// Gets or sets the end date.
+        /// </summary>
+        /// <value>
+        /// The end date.
+        /// </value>
+        public DateTime EndDate { get; set; }
     }
 }

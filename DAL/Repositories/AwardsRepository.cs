@@ -27,8 +27,8 @@ namespace DAL.Repositories
             try
             {
                 var sql = @"
-                    INSERT INTO Awards (Name, Amount, PeriodType, DateCreated)
-                    VALUES (@Name, @Amount, @PeriodType, @DateCreated);
+                    INSERT INTO Awards (Name, Amount, PeriodType, StartDate, EndDate)
+                    VALUES (@Name, @Amount, @PeriodType, @StartDate, @EndDate);
                     SELECT CAST(SCOPE_IDENTITY() as int);";
 
                 award.Id = await dbConnection.QuerySingleAsync<int>(sql, new
@@ -36,7 +36,8 @@ namespace DAL.Repositories
                     award.Name,
                     award.Amount,
                     PeriodType = (int)award.PeriodType,
-                    DateCreated = DateTime.Now
+                    award.StartDate,
+                    award.EndDate
                 });
 
                 this.logger.Information("Created award {@Award}", award);
@@ -79,7 +80,7 @@ namespace DAL.Repositories
                 var sql = @"
                     SELECT SUM(Amount) 
                     FROM Awards
-                    WHERE CONVERT(date, DateCreated) = @Date";
+                    WHERE CONVERT(date, StartDate) = @Date";
 
                 var totalAmount = await dbConnection.QuerySingleAsync<decimal>(sql, new { Date = date });
 

@@ -102,5 +102,26 @@ namespace DAL
                 throw;
             }
         }
+
+        /// <summary>Gets the users by registration date asynchronous.</summary>
+        /// <param name="date">The date.</param>
+        /// <returns>
+        /// Users registered on specified date.
+        /// </returns>
+        public async Task<IEnumerable<User>> GetUsersByRegistrationDateAsync(DateTime date)
+        {
+            try
+            {
+                var sql = "SELECT * FROM Users WHERE CAST(RegistrationDate AS DATE) = CAST(@Date AS DATE)";
+                var users = await dbConnection.QueryAsync<User>(sql, new { Date = date });
+                this.logger.Information("Retrieved users with registration date {Date}", date);
+                return users;
+            }
+            catch (Exception ex)
+            {
+                this.logger.Error(ex, "Error retrieving users with registration date {Date}", date);
+                throw;
+            }
+        }
     }
 }

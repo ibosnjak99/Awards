@@ -1,5 +1,4 @@
 ﻿using Application.Dtos;
-using Domain.Models;
 
 namespace Application.Services.Interfaces
 {
@@ -17,7 +16,7 @@ namespace Application.Services.Interfaces
         /// <returns>
         /// The collection of awards.
         /// </returns>
-        Task<IEnumerable<Award>> GetAwardsByTypeAsync(string type);
+        Task<IEnumerable<AwardDto>> GetAwardsByTypeAsync(string type);
 
         /// <summary>Gets the total award amount by date asynchronous.</summary>
         /// <param name="date">The date.</param>

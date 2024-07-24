@@ -17,6 +17,7 @@ namespace Application
             CreateMap<RegisterUserDto, User>();
             CreateMap<UserDto, User>();
             CreateMap<AwardCreateDto, Award>();
+            CreateMap<Award, AwardDto>();
         }
     }
 }

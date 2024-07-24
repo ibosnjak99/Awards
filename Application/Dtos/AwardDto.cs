@@ -3,10 +3,18 @@
 namespace Application.Dtos
 {
     /// <summary>
-    /// The award create dto.
+    /// The award class.
     /// </summary>
-    public class AwardCreateDto
+    public class AwardDto
     {
+        /// <summary>
+        /// Gets or sets the identifier.
+        /// </summary>
+        /// <value>
+        /// The identifier.
+        /// </value>
+        public int Id { get; set; }
+
         /// <summary>
         /// Gets or sets the name.
         /// </summary>
@@ -24,10 +32,10 @@ namespace Application.Dtos
         public decimal Amount { get; set; }
 
         /// <summary>
-        /// Gets or sets the period type.
+        /// Gets or sets the type of the period.
         /// </summary>
         /// <value>
-        /// The period type.
+        /// The type of the period.
         /// </value>
         public PeriodType PeriodType { get; set; }
 

@@ -31,9 +31,9 @@ namespace API.Controllers
         /// <summary>Gets the type of the awards by.</summary>
         /// <param name="type">The type.</param>
         [HttpGet("{type}")]
-        public async Task GetAwardsByType(string type)
+        public async Task<IEnumerable<AwardDto>> GetAwardsByType(string type)
         {
-            await this.awardsService.GetAwardsByTypeAsync(type);
+            return await this.awardsService.GetAwardsByTypeAsync(type);
         }
 
         /// <summary>Gets the awards by date.</summary>

@@ -30,7 +30,7 @@ namespace Services
         /// </returns>
         public async Task<UserDto> RegisterUserAsync(RegisterUserDto userDto)
         {
-            userDto.RegistrationDate = DateTime.Now;
+            //userDto.RegistrationDate = DateTime.Now;
             var user = this.mapper.Map<User>(userDto);
             var createdUser = await this.usersRepository.RegisterUserAsync(user);
             return this.mapper.Map<UserDto>(createdUser);
@@ -54,6 +54,17 @@ namespace Services
         public async Task<IEnumerable<UserDto>> GetAllUsersAsync()
         {
             var users = await this.usersRepository.GetAllUsersAsync();
+            return users.Select(this.mapper.Map<UserDto>);
+        }
+
+        /// <summary>Gets the users by registration date asynchronous.</summary>
+        /// <param name="date">The date.</param>
+        /// <returns>
+        /// Users registered on specified date.
+        /// </returns>
+        public async Task<IEnumerable<UserDto>> GetUsersByRegistrationDateAsync(DateTime date)
+        {
+            var users = await this.usersRepository.GetUsersByRegistrationDateAsync(date);
             return users.Select(this.mapper.Map<UserDto>);
         }
     }
