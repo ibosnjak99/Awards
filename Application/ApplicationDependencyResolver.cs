@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Application.Services;
+using Application.Services.Interfaces;
+using Microsoft.Extensions.DependencyInjection;
 using Services;
 using Services.Interfaces;
 
@@ -14,6 +16,8 @@ namespace Application
         public static void RegisterApplicationDependencies(this IServiceCollection services)
         {
             services.AddScoped<IUsersService, UsersService>();
+            services.AddScoped<IAwardsService, AwardsService>();
+            services.AddScoped<IUserFinancesService, UserFinancesService>();
         }
     }
 }

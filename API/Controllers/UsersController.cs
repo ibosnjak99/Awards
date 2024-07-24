@@ -1,6 +1,5 @@
 ﻿using Application.Dtos;
 using Microsoft.AspNetCore.Mvc;
-using Services;
 using Services.Interfaces;
 
 namespace API.Controllers
@@ -10,7 +9,7 @@ namespace API.Controllers
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
-    public class UsersController : ControllerBase
+    public class UsersController
     {
         private readonly IUsersService usersService;
 
@@ -51,6 +50,15 @@ namespace API.Controllers
         public async Task<IEnumerable<UserDto>> GetAllUsers()
         {
             return await this.usersService.GetAllUsersAsync();
+        }
+
+        /// <summary>Gets users by registration date asynchronous.</summary>
+        /// <param name="date">The date.</param>
+        /// <returns>Users registered on specified date.</returns>
+        [HttpGet("date")]
+        public async Task<IEnumerable<UserDto>> GetUsersByRegistrationDateAsync([FromQuery] DateTime date)
+        {
+            return await this.usersService.GetUsersByRegistrationDateAsync(date);
         }
     }
 }
