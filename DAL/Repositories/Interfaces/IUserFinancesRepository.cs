@@ -19,5 +19,11 @@ namespace DAL.Repositories.Interfaces
         /// </summary>
         /// <param name="userFinance">The user finance.</param>
         Task UpdateBalanceAsync(UserFinance userFinance);
+
+        /// <summary>
+        /// Creates the user finance asynchronous.
+        /// </summary>
+        /// <param name="userFinance">The user finance.</param>
+        Task CreateUserFinanceAsync(UserFinance userFinance);
     }
 }

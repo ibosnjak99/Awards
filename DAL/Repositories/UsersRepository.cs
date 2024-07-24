@@ -1,6 +1,7 @@
 ﻿using DAL.Repositories.Interfaces;
 using Dapper;
 using Domain;
+using Domain.Models;
 using Serilog;
 using System.Data;
 
@@ -13,14 +14,16 @@ namespace DAL
     {
         private readonly IDbConnection dbConnection;
         private readonly ILogger logger;
+        private readonly IUserFinancesRepository userFinancesRepository;
 
         /// <summary>Initializes a new instance of the <see cref="UsersRepository" /> class.</summary>
         /// <param name="dbConnection">The database connection.</param>
         /// <param name="logger">The logger.</param>
-        public UsersRepository(IDbConnection dbConnection, ILogger logger)
+        public UsersRepository(IDbConnection dbConnection, ILogger logger, IUserFinancesRepository userFinancesRepository)
         {
             this.dbConnection = dbConnection;
             this.logger = logger;
+            this.userFinancesRepository = userFinancesRepository;
         }
 
         /// <summary>
@@ -46,6 +49,14 @@ namespace DAL
 
                 user.PID = userPid;
                 this.logger.Information("Registered user {@User}", user);
+
+                var userFinance = new UserFinance
+                {
+                    UserId = user.PID,
+                    Balance = 0
+                };
+                await this.userFinancesRepository.CreateUserFinanceAsync(userFinance);
+
                 return user;
             }
             catch (Exception ex)

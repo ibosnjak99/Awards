@@ -71,5 +71,30 @@ namespace DAL.Repositories
                 throw;
             }
         }
+
+        /// <summary>Creates the user finance asynchronous.</summary>
+        /// <param name="userFinance">The user finance.</param>
+        public async Task CreateUserFinanceAsync(UserFinance userFinance)
+        {
+            try
+            {
+                var sql = @"
+                    INSERT INTO UserFinance (UserId, Balance)
+                    VALUES (@UserId, @Balance);";
+
+                await dbConnection.ExecuteAsync(sql, new
+                {
+                    userFinance.UserId,
+                    userFinance.Balance
+                });
+
+                this.logger.Information("Created user finance for user {UserId}", userFinance.UserId);
+            }
+            catch (Exception ex)
+            {
+                this.logger.Error(ex, "Error creating user finance for user {UserId}", userFinance.UserId);
+                throw;
+            }
+        }
     }
 }

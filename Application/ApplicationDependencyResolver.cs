@@ -16,7 +16,8 @@ namespace Application
         public static void RegisterApplicationDependencies(this IServiceCollection services)
         {
             services.AddScoped<IUsersService, UsersService>();
-            services.AddTransient<IAwardsService, AwardsService>();
+            services.AddScoped<IAwardsService, AwardsService>();
+            services.AddScoped<IUserFinancesService, UserFinancesService>();
         }
     }
 }

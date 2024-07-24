@@ -30,9 +30,9 @@ namespace Services
         /// </returns>
         public async Task<UserDto> RegisterUserAsync(RegisterUserDto userDto)
         {
-            //userDto.RegistrationDate = DateTime.Now;
             var user = this.mapper.Map<User>(userDto);
             var createdUser = await this.usersRepository.RegisterUserAsync(user);
+
             return this.mapper.Map<UserDto>(createdUser);
         }
 
