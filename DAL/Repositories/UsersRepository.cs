@@ -4,6 +4,8 @@ using Domain;
 using Domain.Models;
 using Serilog;
 using System.Data;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace DAL
 {
@@ -26,44 +28,42 @@ namespace DAL
             this.userFinancesRepository = userFinancesRepository;
         }
 
-        /// <summary>
-        /// Registers the user asynchronous.
-        /// </summary>
+        /// <summary>Registers the user asynchronous.</summary>
         /// <param name="user">The user.</param>
-        /// <returns>The user object.</returns>
-        public async Task<User> RegisterUserAsync(User user)
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>
+        /// The user object.
+        /// </returns>
+        public async Task<User> RegisterUserAsync(User user, CancellationToken cancellationToken)
         {
             try
             {
-                var existingUser = await dbConnection.QuerySingleOrDefaultAsync<User>(
-                    "SELECT * FROM Users WHERE Email = @Email", new { user.Email });
-
-                if (existingUser != null)
-                {
-                    throw new DuplicateNameException($"A user with email {user.Email} already exists.");
-                }
-
                 var sql = @"
-                    INSERT INTO Users (FirstName, LastName, RegistrationDate, Email)
-                    VALUES (@FirstName, @LastName, @RegistrationDate, @Email);
-                    SELECT CAST(SCOPE_IDENTITY() as int);";
+                INSERT INTO Users (FirstName, LastName, Email, RegistrationDate)
+                VALUES (@FirstName, @LastName, @Email, @RegistrationDate);
+                SELECT CAST(SCOPE_IDENTITY() as int);";
 
-                var userPid = await dbConnection.QuerySingleAsync<int>(sql, new
+                var command = new CommandDefinition(sql, new
                 {
                     user.FirstName,
                     user.LastName,
-                    user.RegistrationDate,
-                    user.Email
-                });
+                    user.Email,
+                    user.RegistrationDate
+                }, cancellationToken: cancellationToken);
+
+                var userPid = await dbConnection.QuerySingleAsync<int>(command);
 
                 user.PID = userPid;
                 this.logger.Information("Registered user {@User}", user);
+
+                var userFinance = new UserFinance
+                {
+                    UserId = user.PID,
+                    Balance = 0
+                };
+                await this.userFinancesRepository.CreateUserFinanceAsync(userFinance, cancellationToken);
+
                 return user;
-            }
-            catch (DuplicateNameException ex)
-            {
-                this.logger.Warning(ex, "Duplicate user registration attempt {@User}", user);
-                throw;
             }
             catch (Exception ex)
             {

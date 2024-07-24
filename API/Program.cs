@@ -7,6 +7,7 @@ using System.Data;
 using FluentValidation;
 using Application.Dtos;
 using Application.Validators;
+using API.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,6 +35,8 @@ builder.Services.AddSingleton<IHostedService, PeriodicAwardService>();
 builder.Services.AddScoped<IValidator<RegisterUserDto>, UserValidator>();
 
 var app = builder.Build();
+
+app.UseMiddleware<RequestTimeoutMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

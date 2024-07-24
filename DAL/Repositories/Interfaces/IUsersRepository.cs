@@ -9,10 +9,11 @@ namespace DAL.Repositories.Interfaces
     {
         /// <summary>Registers the user asynchronous.</summary>
         /// <param name="user">The user.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>
         /// The user object.
         /// </returns>
-        Task<User> RegisterUserAsync(User user);
+        Task<User> RegisterUserAsync(User user, CancellationToken cancellationToken);
 
         /// <summary>Gets the user by identifier asynchronous.</summary>
         /// <param name="id">The identifier.</param>

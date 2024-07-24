@@ -9,10 +9,11 @@ namespace Services.Interfaces
     {
         /// <summary>Registers the user asynchronous.</summary>
         /// <param name="userDto">The user dto.</param>
+        /// <param name="cancellationToken"></param>
         /// <returns>
-        ///   <br />
+        /// The registered user dto.
         /// </returns>
-        Task<UserDto> RegisterUserAsync(RegisterUserDto userDto);
+        Task<UserDto> RegisterUserAsync(RegisterUserDto userDto, CancellationToken cancellationToken);
 
         /// <summary>
         /// Gets the user by identifier asynchronous.

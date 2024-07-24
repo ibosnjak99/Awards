@@ -141,8 +141,11 @@ namespace Application.Services
                     if (randomUser != null)
                     {
                         var randomUserFinance = await this.userFinancesRepository.GetUserFinanceByUserIdAsync(randomUser.PID);
-                        randomUserFinance.Balance += award.Amount;
-                        await userFinancesRepository.UpdateBalanceAsync(randomUserFinance);
+                        if (randomUserFinance != null)
+                        {
+                            randomUserFinance.Balance += award.Amount;
+                            await userFinancesRepository.UpdateBalanceAsync(randomUserFinance);
+                        }
                     }
 
                     if (!award.IsRecurring)

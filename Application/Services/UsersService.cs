@@ -4,7 +4,6 @@ using Services.Interfaces;
 using AutoMapper;
 using Domain;
 using FluentValidation;
-using Application.Validators;
 
 namespace Services
 {
@@ -29,10 +28,11 @@ namespace Services
 
         /// <summary>Registers the user asynchronous.</summary>
         /// <param name="userDto">The user dto.</param>
+        /// <param name="cancellationToken"></param>
         /// <returns>
-        /// The user dto.
+        /// The registered user dto.
         /// </returns>
-        public async Task<UserDto> RegisterUserAsync(RegisterUserDto userDto)
+        public async Task<UserDto> RegisterUserAsync(RegisterUserDto userDto, CancellationToken cancellationToken)
         {
             var validationResult = await this.validator.ValidateAsync(userDto);
 
@@ -42,7 +42,7 @@ namespace Services
             }
 
             var user = this.mapper.Map<User>(userDto);
-            var createdUser = await this.usersRepository.RegisterUserAsync(user);
+            var createdUser = await this.usersRepository.RegisterUserAsync(user, cancellationToken);
 
             return this.mapper.Map<UserDto>(createdUser);
         }

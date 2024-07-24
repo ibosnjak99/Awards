@@ -72,9 +72,12 @@ namespace DAL.Repositories
             }
         }
 
-        /// <summary>Creates the user finance asynchronous.</summary>
+        /// <summary>
+        /// Creates the user finance asynchronous.
+        /// </summary>
         /// <param name="userFinance">The user finance.</param>
-        public async Task CreateUserFinanceAsync(UserFinance userFinance)
+        /// <param name="cancellationToken">The cancellation token.</param>
+        public async Task CreateUserFinanceAsync(UserFinance userFinance, CancellationToken cancellationToken)
         {
             try
             {

@@ -13,8 +13,14 @@ namespace Application.Validators
         /// </summary>
         public UserValidator()
         {
-            RuleFor(u => u.FirstName).NotEmpty().WithMessage("First name is required.");
-            RuleFor(u => u.LastName).NotEmpty().WithMessage("Last name is required.");
+            RuleFor(u => u.FirstName)
+               .NotEmpty().WithMessage("First name is required.")
+               .Matches(@"^[a-zA-Z]+$").WithMessage("First name should contain only letters.");
+
+            RuleFor(u => u.LastName)
+                .NotEmpty().WithMessage("Last name is required.")
+                .Matches(@"^[a-zA-Z]+$").WithMessage("Last name should contain only letters.");
+
             RuleFor(u => u.Email).NotEmpty().WithMessage("Email address is required.").EmailAddress().WithMessage("Invalid email format.");
         }
     }

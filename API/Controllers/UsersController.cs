@@ -24,11 +24,12 @@ namespace API.Controllers
 
         /// <summary>Registers the user.</summary>
         /// <param name="userDto">The user dto.</param>
+        /// <param name="cancellationToken"></param>
         /// <returns>The registered user dto.</returns>
         [HttpPost]
-        public async Task<UserDto> RegisterUser([FromBody] RegisterUserDto userDto)
+        public async Task<UserDto> RegisterUser([FromBody] RegisterUserDto userDto, CancellationToken cancellationToken)
         {
-            return await usersService.RegisterUserAsync(userDto);
+            return await usersService.RegisterUserAsync(userDto, cancellationToken);
         }
 
         /// <summary>
