@@ -4,6 +4,9 @@ using DAL;
 using Microsoft.Data.SqlClient;
 using Serilog;
 using System.Data;
+using FluentValidation;
+using Application.Dtos;
+using Application.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,6 +31,7 @@ builder.Services.AddScoped<IDbConnection>(sp =>
 });
 
 builder.Services.AddSingleton<IHostedService, PeriodicAwardService>();
+builder.Services.AddScoped<IValidator<RegisterUserDto>, UserValidator>();
 
 var app = builder.Build();
 
