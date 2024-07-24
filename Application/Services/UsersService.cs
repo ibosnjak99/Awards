@@ -3,6 +3,8 @@ using DAL.Repositories.Interfaces;
 using Services.Interfaces;
 using AutoMapper;
 using Domain;
+using FluentValidation;
+using Application.Validators;
 
 namespace Services
 {
@@ -13,14 +15,16 @@ namespace Services
     {
         private readonly IUsersRepository usersRepository;
         private readonly IMapper mapper;
+        private readonly IValidator<RegisterUserDto> validator;
 
         /// <summary>Initializes a new instance of the <see cref="UsersService" /> class.</summary>
         /// <param name="usersRepository">The users repository.</param>
         /// <param name="mapper"></param>
-        public UsersService(IUsersRepository usersRepository, IMapper mapper)
+        public UsersService(IUsersRepository usersRepository, IMapper mapper, IValidator<RegisterUserDto> validator)
         {
             this.usersRepository = usersRepository;
             this.mapper = mapper;
+            this.validator = validator;
         }
 
         /// <summary>Registers the user asynchronous.</summary>
@@ -30,6 +34,13 @@ namespace Services
         /// </returns>
         public async Task<UserDto> RegisterUserAsync(RegisterUserDto userDto)
         {
+            var validationResult = await this.validator.ValidateAsync(userDto);
+
+            if (!validationResult.IsValid)
+            {
+                throw new ValidationException(validationResult.Errors);
+            }
+
             var user = this.mapper.Map<User>(userDto);
             var createdUser = await this.usersRepository.RegisterUserAsync(user);
 

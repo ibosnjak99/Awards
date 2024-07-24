@@ -35,29 +35,35 @@ namespace DAL
         {
             try
             {
+                var existingUser = await dbConnection.QuerySingleOrDefaultAsync<User>(
+                    "SELECT * FROM Users WHERE Email = @Email", new { user.Email });
+
+                if (existingUser != null)
+                {
+                    throw new DuplicateNameException($"A user with email {user.Email} already exists.");
+                }
+
                 var sql = @"
-                INSERT INTO Users (FirstName, LastName, RegistrationDate)
-                VALUES (@FirstName, @LastName, @RegistrationDate);
-                SELECT CAST(SCOPE_IDENTITY() as int);";
+                    INSERT INTO Users (FirstName, LastName, RegistrationDate, Email)
+                    VALUES (@FirstName, @LastName, @RegistrationDate, @Email);
+                    SELECT CAST(SCOPE_IDENTITY() as int);";
 
                 var userPid = await dbConnection.QuerySingleAsync<int>(sql, new
                 {
                     user.FirstName,
                     user.LastName,
-                    user.RegistrationDate
+                    user.RegistrationDate,
+                    user.Email
                 });
 
                 user.PID = userPid;
                 this.logger.Information("Registered user {@User}", user);
-
-                var userFinance = new UserFinance
-                {
-                    UserId = user.PID,
-                    Balance = 0
-                };
-                await this.userFinancesRepository.CreateUserFinanceAsync(userFinance);
-
                 return user;
+            }
+            catch (DuplicateNameException ex)
+            {
+                this.logger.Warning(ex, "Duplicate user registration attempt {@User}", user);
+                throw;
             }
             catch (Exception ex)
             {
