@@ -38,5 +38,13 @@ namespace Application.Dtos
         /// The start date.
         /// </value>
         public DateTime StartDate { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this award is recurring.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if this award is recurring; otherwise, <c>false</c>.
+        /// </value>
+        public bool IsRecurring { get; set; }
     }
 }

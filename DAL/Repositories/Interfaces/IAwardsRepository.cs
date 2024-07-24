@@ -18,8 +18,22 @@ namespace DAL.Repositories.Interfaces
         /// </returns>
         Task<IEnumerable<Award>> GetAwardsByTypeAsync(string type);
 
-        /// <summary>Gets the total award amount by date asynchronous.</summary>
+        /// <summary>Gets the awards asynchronous.</summary>
+        /// <returns>
+        /// The collection of awards.
+        /// </returns>
+        Task<IEnumerable<Award>> GetAllAwardsAsync();
+
+        /// <summary>
+        /// Gets the total award amount by date asynchronous.
+        /// </summary>
         /// <param name="date">The date.</param>
         Task<decimal> GetTotalAwardAmountByDateAsync(DateTime date);
+
+        /// <summary>
+        /// Sets the award to finished asynchronous.
+        /// </summary>
+        /// <param name="awardId">The award identifier.</param>
+        Task SetAwardToFinishedAsync(int awardId);   
     }
 }

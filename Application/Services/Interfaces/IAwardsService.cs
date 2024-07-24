@@ -18,8 +18,17 @@ namespace Application.Services.Interfaces
         /// </returns>
         Task<IEnumerable<AwardDto>> GetAwardsByTypeAsync(string type);
 
+        /// <summary>Gets the awards asynchronous.</summary>
+        /// <returns>
+        /// The collection of awards.
+        /// </returns>
+        Task<IEnumerable<AwardDto>> GetAllAwardsAsync();
+
         /// <summary>Gets the total award amount by date asynchronous.</summary>
         /// <param name="date">The date.</param>
         Task<decimal> GetTotalAwardAmountByDateAsync(DateTime date);
+
+        /// <summary>Distributes the awards asynchronous.</summary>
+        Task DistributeAwardsAsync();
     }
 }

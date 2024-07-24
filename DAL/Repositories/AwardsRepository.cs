@@ -71,6 +71,27 @@ namespace DAL.Repositories
             }
         }
 
+        /// <summary>Gets the awards asynchronous.</summary>
+        /// <returns>
+        /// The collection of awards.
+        /// </returns>
+        public async Task<IEnumerable<Award>> GetAllAwardsAsync()
+        {
+            try
+            {
+                var sql = "SELECT * FROM Awards";
+                var awards = await dbConnection.QueryAsync<Award>(sql);
+
+                this.logger.Information("Retrieved awards");
+                return awards;
+            }
+            catch (Exception ex)
+            {
+                this.logger.Error(ex, "Error retrieving awards");
+                throw;
+            }
+        }
+
         /// <summary>Gets the total award amount by date asynchronous.</summary>
         /// <param name="date">The date.</param>
         public async Task<decimal> GetTotalAwardAmountByDateAsync(DateTime date)
@@ -90,6 +111,29 @@ namespace DAL.Repositories
             catch (Exception ex)
             {
                 this.logger.Error(ex, "Error retrieving total award amount by date {Date}", date);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Sets the award to finished asynchronous.
+        /// </summary>
+        /// <param name="awardId">The award identifier.</param>
+        public async Task SetAwardToFinishedAsync(int awardId)
+        {
+            try
+            {
+                var sql = @"
+                    UPDATE Awards
+                    SET IsFinished = 1
+                    WHERE Id = @AwardId";
+
+                await dbConnection.ExecuteAsync(sql, new { AwardId = awardId });
+                this.logger.Information("Set award with id {AwardId} to finished", awardId);
+            }
+            catch (Exception ex)
+            {
+                this.logger.Error(ex, "Error setting award with id {AwardId} to finished", awardId);
                 throw;
             }
         }

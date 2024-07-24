@@ -54,5 +54,21 @@ namespace Domain.Models
         /// The end date.
         /// </value>
         public DateTime EndDate { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this award is recurring.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if this award is recurring; otherwise, <c>false</c>.
+        /// </value>
+        public bool IsRecurring { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this award is finished.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if this award is finished; otherwise, <c>false</c>.
+        /// </value>
+        public bool IsFinished { get; set; }
     }
 }

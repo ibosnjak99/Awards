@@ -1,4 +1,5 @@
 using Application;
+using Application.BackgroundServices;
 using DAL;
 using Microsoft.Data.SqlClient;
 using Serilog;
@@ -25,6 +26,8 @@ builder.Services.AddScoped<IDbConnection>(sp =>
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
     return new SqlConnection(connectionString);
 });
+
+builder.Services.AddSingleton<IHostedService, PeriodicAwardService>();
 
 var app = builder.Build();
 
