@@ -24,6 +24,18 @@ Log.Logger = new LoggerConfiguration()
 
 builder.Services.AddSingleton(Log.Logger);
 
+builder.Services.AddCors(opt =>
+{
+    opt.AddPolicy("CorsPolicy", policy =>
+    {
+        policy
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials()
+            .WithOrigins("http://localhost:3000");
+    });
+});
+
 builder.Services.AddScoped<IDbConnection>(sp =>
 {
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -43,7 +55,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseCors("CorsPolicy");
 app.UseAuthorization();
 
 app.MapControllers();
