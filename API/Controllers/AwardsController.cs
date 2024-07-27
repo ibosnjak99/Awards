@@ -36,12 +36,19 @@ namespace API.Controllers
             return await this.awardsService.GetAwardsByTypeAsync(type);
         }
 
+        /// <summary>Gets the awards.</summary>
+        [HttpGet]
+        public async Task<IEnumerable<AwardDto>> GetAllAwardsAsync()
+        {
+            return await this.awardsService.GetAllAwardsAsync();
+        }
+
         /// <summary>Gets the awards by date.</summary>
         /// <param name="date">The date.</param>
-        [HttpGet("search")]
-        public async Task<decimal> GetAwardsByDate([FromQuery] DateTime date)
+        [HttpGet("totalAmountByDate")]
+        public async Task<decimal> GetTotalAwardAmountByDateAsync([FromQuery] DateOnly date)
         {
-            return await this.awardsService.GetTotalAwardAmountByDateAsync(date);
+           return await this.awardsService.GetTotalAwardAmountByDateAsync(date);
         }
 
         /// <summary>Gets the latest winner for specific award.</summary>

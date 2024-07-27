@@ -29,7 +29,7 @@ namespace DAL.Repositories.Interfaces
         /// Gets the total award amount by date asynchronous.
         /// </summary>
         /// <param name="date">The date.</param>
-        Task<decimal> GetTotalAwardAmountByDateAsync(DateTime date);
+        Task<decimal> GetTotalAwardAmountByDateAsync(DateOnly date);
 
         /// <summary>
         /// Sets the award to finished asynchronous.

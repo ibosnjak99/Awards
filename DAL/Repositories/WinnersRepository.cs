@@ -1,8 +1,7 @@
-﻿using System.Data;
-using System.Threading.Tasks;
+﻿using DAL.Repositories.Interfaces;
 using Dapper;
-using DAL.Repositories.Interfaces;
 using Domain.Models;
+using System.Data;
 
 namespace DAL.Repositories
 {

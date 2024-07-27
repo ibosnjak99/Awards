@@ -47,6 +47,7 @@ namespace Application.Services
         /// <param name="awardDto">The award dto.</param>
         public async Task CreateAwardAsync(AwardCreateDto awardDto)
         {
+            awardDto.StartDate = DateTime.Now;
             var award = this.mapper.Map<Award>(awardDto);
 
             switch (award.PeriodType)
@@ -95,7 +96,7 @@ namespace Application.Services
 
         /// <summary>Gets the total award amount by date asynchronous.</summary>
         /// <param name="date">The date.</param>
-        public async Task<decimal> GetTotalAwardAmountByDateAsync(DateTime date)
+        public async Task<decimal> GetTotalAwardAmountByDateAsync(DateOnly date)
         {
             return await awardsRepository.GetTotalAwardAmountByDateAsync(date);
         }

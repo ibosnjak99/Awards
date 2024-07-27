@@ -95,16 +95,17 @@ namespace DAL.Repositories
 
         /// <summary>Gets the total award amount by date asynchronous.</summary>
         /// <param name="date">The date.</param>
-        public async Task<decimal> GetTotalAwardAmountByDateAsync(DateTime date)
+        public async Task<decimal> GetTotalAwardAmountByDateAsync(DateOnly date)
         {
             try
             {
-                var sql = @"
-                    SELECT SUM(Amount) 
-                    FROM Awards
-                    WHERE CONVERT(date, StartDate) = @Date";
+                const string sql = @"
+                    SELECT COALESCE(SUM(a.Amount), 0) AS TotalAmount
+                    FROM Winners w
+                    INNER JOIN Awards a ON w.AwardId = a.Id
+                    WHERE CONVERT(date, w.DateTimeAwarded) = @Date";
 
-                var totalAmount = await dbConnection.QuerySingleAsync<decimal>(sql, new { Date = date });
+                var totalAmount = await dbConnection.QuerySingleAsync<decimal>(sql, new { Date = date.ToString("yyyy-MM-dd") });
 
                 this.logger.Information("Retrieved total award amount by date {Date}", date);
                 return totalAmount;
