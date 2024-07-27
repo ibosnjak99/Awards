@@ -30,5 +30,12 @@ namespace Application.Services.Interfaces
 
         /// <summary>Distributes the awards asynchronous.</summary>
         Task DistributeAwardsAsync();
+
+        /// <summary>Gets the latest winner for specific award.</summary>
+        /// <param name="awardId">The award identifier.</param>
+        /// <returns>
+        /// The user dto.
+        /// </returns>
+        Task<UserDto> GetLatestWinnerForSpecifiedAward(int awardId);
     }
 }

@@ -1,5 +1,6 @@
 ﻿using DAL.Repositories.Interfaces;
 using Dapper;
+using Domain;
 using Domain.Models;
 using Serilog;
 using System.Data;
@@ -134,6 +135,40 @@ namespace DAL.Repositories
             catch (Exception ex)
             {
                 this.logger.Error(ex, "Error setting award with id {AwardId} to finished", awardId);
+                throw;
+            }
+        }
+
+        /// <summary>Gets the latest winner for specific award.</summary>
+        /// <param name="awardId">The award identifier.</param>
+        /// <returns>The user.</returns>
+        public async Task<User> GetLatestWinnerForSpecifiedAward(int awardId)
+        {
+            try
+            {
+                var sql = @"
+                    SELECT TOP 1 u.*
+                    FROM Winners w
+                    INNER JOIN Users u ON w.UserId = u.PID
+                    WHERE w.AwardId = @AwardId
+                    ORDER BY w.DateTimeAwarded DESC";
+
+                var user = await dbConnection.QuerySingleOrDefaultAsync<User>(sql, new { AwardId = awardId });
+
+                if (user != null)
+                {
+                    this.logger.Information("Retrieved latest winner for award with id {AwardId}", awardId);
+                }
+                else
+                {
+                    this.logger.Information("No winners found for award with id {AwardId}", awardId);
+                }
+
+                return user;
+            }
+            catch (Exception ex)
+            {
+                this.logger.Error(ex, "Error retrieving latest winner for award with id {AwardId}", awardId);
                 throw;
             }
         }

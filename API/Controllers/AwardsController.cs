@@ -43,5 +43,16 @@ namespace API.Controllers
         {
             return await this.awardsService.GetTotalAwardAmountByDateAsync(date);
         }
+
+        /// <summary>Gets the latest winner for specific award.</summary>
+        /// <param name="id">The award identifier.</param>
+        /// <returns>
+        /// The user dto.
+        /// </returns>
+        [HttpGet("lastWinner/{id}")]
+        public async Task<UserDto> GetLatestWinnerForSpecifiedAward(int id)
+        {
+            return await this.awardsService.GetLatestWinnerForSpecifiedAward(id);
+        }
     }
 }

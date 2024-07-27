@@ -27,6 +27,12 @@ namespace DAL.Repositories.Interfaces
         /// </returns>
         Task<IEnumerable<User>> GetAllUsersAsync();
 
+        /// <summary>Gets the random user asynchronous.</summary>
+        /// <returns>
+        /// The random user.
+        /// </returns>
+        Task<User> GetRandomUserAsync();
+
         /// <summary>Gets the users by registration date asynchronous.</summary>
         /// <param name="date">The date.</param>
         /// <returns>
