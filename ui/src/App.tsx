@@ -6,77 +6,118 @@ import AccordionDetails from '@mui/material/AccordionDetails';
 import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogTitle from '@mui/material/DialogTitle';
-import TextField from '@mui/material/TextField';
-import Box from '@mui/material/Box';
-import { fetchUsers, fetchAwardsByType, registerUser } from './client';
-import { UserDto, RegisterUserDto, AwardDto } from './types';
+import Calendar from 'react-calendar';
+import 'react-calendar/dist/Calendar.css';
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
+import { fetchAwardsByType, fetchUsersByRegistrationDate, fetchLatestWinnerForAward, getTotalAwardAmountByDate } from './client';
+import { UserDto, AwardDto } from './types';
 import './App.css';
 import RegisterForm from './RegisterForm';
+import CreateAwardForm from './CreateAwardForm';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
-  const [users, setUsers] = useState<UserDto[]>([]);
   const [awards, setAwards] = useState<AwardDto[]>([]);
-  const [open, setOpen] = useState(false);
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [registeredUsers, setRegisteredUsers] = useState<UserDto[]>([]);
+  const [tabValue, setTabValue] = useState(0);
+  const [awardWinners, setAwardWinners] = useState<{ [key: number]: UserDto }>({});
+  const [totalAwardAmount, setTotalAwardAmount] = useState<number | null>(null);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchInitialAwards = async () => {
       try {
-        const usersData = await fetchUsers();
-        setUsers(usersData);
-        
         const awardsData = await fetchAwardsByType('0');
         setAwards(awardsData);
+        await fetchAwardWinners(awardsData);
+        const today = new Date();
+        const totalAmount = await getTotalAwardAmountByDate(today);
+        setTotalAwardAmount(totalAmount);
+        toast.success('Awards and total amount for today fetched successfully');
       } catch (error) {
-        console.error('Error fetching data:', error);
+        toast.error('Error fetching awards or total amount for today');
       }
     };
 
-    fetchData();
+    fetchInitialAwards();
   }, []);
 
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
-
-  const handleRegister = async () => {
-    const registrationDate = new Date().toISOString();
-    const user: RegisterUserDto = { firstName, lastName, email, registrationDate };
-
+  const fetchAwardWinners = async (awards: AwardDto[]) => {
     try {
-      const registeredUser = await registerUser(user);
-      console.log('User registered:', registeredUser);
-      handleClose();
+      const winners = await Promise.all(
+        awards.map(async (award) => {
+          const winner = await fetchLatestWinnerForAward(award.id);
+          return { awardId: award.id, winner };
+        })
+      );
+      const winnerMap = winners.reduce((acc, curr) => {
+        acc[curr.awardId] = curr.winner;
+        return acc;
+      }, {} as { [key: number]: UserDto });
+      setAwardWinners(winnerMap);
+      toast.success('Award winners fetched successfully');
     } catch (error) {
-      console.error('There was an error registering the user:', error);
+      toast.error('Error fetching award winners');
+    }
+  };
+
+  const handleFetchUsers = async () => {
+    if (selectedDate) {
+      try {
+        const registeredUsersData = await fetchUsersByRegistrationDate(selectedDate);
+        setRegisteredUsers(registeredUsersData);
+        toast.success('Users fetched successfully');
+      } catch (error) {
+        toast.error('Error fetching users by registration date');
+      }
+    }
+  };
+
+  const handleTabChange = async (event: React.SyntheticEvent, newValue: number) => {
+    setTabValue(newValue);
+    try {
+      const awardsData = await fetchAwardsByType(newValue.toString());
+      setAwards(awardsData);
+      await fetchAwardWinners(awardsData);
+    } catch (error) {
+      toast.error('Error fetching awards');
     }
   };
 
   return (
     <div className="App">
+      <ToastContainer />
       <h1>Awards</h1>
       <RegisterForm />
+      <CreateAwardForm />
+      <div className="calendar-container">
+        <Calendar
+          onChange={setSelectedDate}
+          value={selectedDate}
+        />
+        <Button
+          sx={{ mt: 2 }}
+          className="fetch-button"
+          variant="contained"
+          color="primary"
+          onClick={handleFetchUsers}
+        >
+          Fetch users for selected date
+        </Button>
+      </div>
       <Grid container spacing={3} justifyContent="center">
         <Grid item xs={12} sm={6}>
           <Accordion>
             <AccordionSummary
               expandIcon={<ExpandMoreIcon />}
             >
-              <Typography>All users</Typography>
+              <Typography>Users registered on selected date</Typography>
             </AccordionSummary>
             <AccordionDetails>
               <ul>
-                {users?.map((user: UserDto) => (
+                {registeredUsers?.map((user: UserDto) => (
                   <li key={user.pid}>
                     {user.firstName} {user.lastName}
                   </li>
@@ -90,16 +131,27 @@ function App() {
             <AccordionSummary
               expandIcon={<ExpandMoreIcon />}
             >
-              <Typography>All awards</Typography>
+              <Typography>All awards - Total amount for today: {totalAwardAmount}</Typography>
             </AccordionSummary>
             <AccordionDetails>
-              <ul>
-                {awards?.map((award: AwardDto) => (
-                  <li key={award.id}>
-                    {award.name} - {award.amount}
-                  </li>
-                ))}
-              </ul>
+              <Tabs value={tabValue} onChange={handleTabChange} aria-label="award tabs">
+                <Tab label="Hourly" />
+                <Tab label="Daily" />
+                <Tab label="Weekly" />
+                <Tab label="Monthly" />
+              </Tabs>
+              <div>
+                <ul>
+                  {awards?.map((award: AwardDto) => {
+                    const winner = awardWinners[award.id];
+                    return (
+                      <li key={award.id}>
+                        {award.name} | Award: {award.amount}KM | Last winner: {winner?.firstName} {winner?.lastName}
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
             </AccordionDetails>
           </Accordion>
         </Grid>

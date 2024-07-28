@@ -34,8 +34,8 @@ namespace Application.BackgroundServices
         /// <returns>A <see cref="T:System.Threading.Tasks.Task">Task</see> that represents the asynchronous Start operation.</returns>
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            this.logger.Information("Periodic Award Service is starting.");
-            timer = new Timer(DistributeAwards, null, TimeSpan.Zero, TimeSpan.FromHours(1));
+            this.logger.Information("Starting distributing periodic awards.");
+            timer = new Timer(DistributeAwards, null, TimeSpan.Zero, TimeSpan.FromSeconds(10));
             return Task.CompletedTask;
         }
 
@@ -44,7 +44,7 @@ namespace Application.BackgroundServices
         /// <returns>A <see cref="T:System.Threading.Tasks.Task">Task</see> that represents the asynchronous Stop operation.</returns>
         public Task StopAsync(CancellationToken cancellationToken)
         {
-            this.logger.Information("Periodic Award Service is stopping.");
+            this.logger.Information("Finished distributing periodic awards.");
             timer?.Change(Timeout.Infinite, 0);
             return Task.CompletedTask;
         }

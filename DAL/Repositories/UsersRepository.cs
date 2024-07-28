@@ -4,6 +4,7 @@ using Domain;
 using Domain.Models;
 using Serilog;
 using System.Data;
+using System.Data.Common;
 
 namespace DAL
 {
@@ -14,16 +15,14 @@ namespace DAL
     {
         private readonly IDbConnection dbConnection;
         private readonly ILogger logger;
-        private readonly IUserFinancesRepository userFinancesRepository;
 
         /// <summary>Initializes a new instance of the <see cref="UsersRepository" /> class.</summary>
         /// <param name="dbConnection">The database connection.</param>
         /// <param name="logger">The logger.</param>
-        public UsersRepository(IDbConnection dbConnection, ILogger logger, IUserFinancesRepository userFinancesRepository)
+        public UsersRepository(IDbConnection dbConnection, ILogger logger)
         {
             this.dbConnection = dbConnection;
             this.logger = logger;
-            this.userFinancesRepository = userFinancesRepository;
         }
 
         /// <summary>
@@ -118,6 +117,16 @@ namespace DAL
                 this.logger.Error(ex, "Error retrieving user with id {Id}", id);
                 throw;
             }
+        }
+
+        /// <summary>Gets the random user asynchronous.</summary>
+        /// <returns>
+        /// The random user.
+        /// </returns>
+        public async Task<User> GetRandomUserAsync()
+        {
+            const string query = "SELECT TOP 1 * FROM Users ORDER BY NEWID()";
+            return await this.dbConnection.QuerySingleOrDefaultAsync<User>(query);
         }
 
         /// <summary>Gets the users by registration date asynchronous.</summary>

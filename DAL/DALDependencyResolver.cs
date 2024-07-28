@@ -16,6 +16,7 @@ namespace DAL
             services.AddScoped<IUsersRepository, UsersRepository>();
             services.AddScoped<IAwardsRepository, AwardsRepository>();
             services.AddScoped<IUserFinancesRepository, UserFinancesRepository>();
+            services.AddScoped<IWinnersRepository, WinnersRepository>();
         }
     }
 }

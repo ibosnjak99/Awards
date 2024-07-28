@@ -1,5 +1,6 @@
 ﻿using DAL.Repositories.Interfaces;
 using Dapper;
+using Domain;
 using Domain.Models;
 using Serilog;
 using System.Data;
@@ -94,16 +95,17 @@ namespace DAL.Repositories
 
         /// <summary>Gets the total award amount by date asynchronous.</summary>
         /// <param name="date">The date.</param>
-        public async Task<decimal> GetTotalAwardAmountByDateAsync(DateTime date)
+        public async Task<decimal> GetTotalAwardAmountByDateAsync(DateOnly date)
         {
             try
             {
-                var sql = @"
-                    SELECT SUM(Amount) 
-                    FROM Awards
-                    WHERE CONVERT(date, StartDate) = @Date";
+                const string sql = @"
+                    SELECT COALESCE(SUM(a.Amount), 0) AS TotalAmount
+                    FROM Winners w
+                    INNER JOIN Awards a ON w.AwardId = a.Id
+                    WHERE CONVERT(date, w.DateTimeAwarded) = @Date";
 
-                var totalAmount = await dbConnection.QuerySingleAsync<decimal>(sql, new { Date = date });
+                var totalAmount = await dbConnection.QuerySingleAsync<decimal>(sql, new { Date = date.ToString("yyyy-MM-dd") });
 
                 this.logger.Information("Retrieved total award amount by date {Date}", date);
                 return totalAmount;
@@ -134,6 +136,40 @@ namespace DAL.Repositories
             catch (Exception ex)
             {
                 this.logger.Error(ex, "Error setting award with id {AwardId} to finished", awardId);
+                throw;
+            }
+        }
+
+        /// <summary>Gets the latest winner for specific award.</summary>
+        /// <param name="awardId">The award identifier.</param>
+        /// <returns>The user.</returns>
+        public async Task<User> GetLatestWinnerForSpecifiedAward(int awardId)
+        {
+            try
+            {
+                var sql = @"
+                    SELECT TOP 1 u.*
+                    FROM Winners w
+                    INNER JOIN Users u ON w.UserId = u.PID
+                    WHERE w.AwardId = @AwardId
+                    ORDER BY w.DateTimeAwarded DESC";
+
+                var user = await dbConnection.QuerySingleOrDefaultAsync<User>(sql, new { AwardId = awardId });
+
+                if (user != null)
+                {
+                    this.logger.Information("Retrieved latest winner for award with id {AwardId}", awardId);
+                }
+                else
+                {
+                    this.logger.Information("No winners found for award with id {AwardId}", awardId);
+                }
+
+                return user;
+            }
+            catch (Exception ex)
+            {
+                this.logger.Error(ex, "Error retrieving latest winner for award with id {AwardId}", awardId);
                 throw;
             }
         }

@@ -26,9 +26,16 @@ namespace Application.Services.Interfaces
 
         /// <summary>Gets the total award amount by date asynchronous.</summary>
         /// <param name="date">The date.</param>
-        Task<decimal> GetTotalAwardAmountByDateAsync(DateTime date);
+        Task<decimal> GetTotalAwardAmountByDateAsync(DateOnly date);
 
         /// <summary>Distributes the awards asynchronous.</summary>
         Task DistributeAwardsAsync();
+
+        /// <summary>Gets the latest winner for specific award.</summary>
+        /// <param name="awardId">The award identifier.</param>
+        /// <returns>
+        /// The user dto.
+        /// </returns>
+        Task<UserDto> GetLatestWinnerForSpecifiedAward(int awardId);
     }
 }

@@ -1,46 +1,86 @@
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 620px;
+  min-height: 100vh;
+}
+
+ul {
+  text-align: left;
+}
+
+li {
+  color: #000;
+}
+
 #root {
-    max-width: 1200px; /* Adjust as needed */
-    width: 90%; /* Adjust as needed */
-    margin: 0 auto;
-    padding: 2rem;
-    text-align: center;
-  }
-  
-  .App {
-    margin-top: 2rem;
-  }
-  
-  h1 {
-    margin-bottom: 2rem;
-  }
-  
-  button {
-    margin-bottom: 2rem;
-  }
-  
-  .MuiAccordion-root {
-    margin-bottom: 1rem;
-  }
-  
-  ul {
-    list-style-type: none;
-    padding: 0;
-  }
-  
-  li {
-    padding: 0.5rem 0;
-    border-bottom: 1px solid #ddd;
-  }
-  
-  li:last-child {
-    border-bottom: none;
-  }
-  
-  .grid-container {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-    justify-items: center;
-    margin-top: 2rem;
-  }
-  
+  max-width: 1200px; 
+  width: 90%; 
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.App {
+  margin-top: 2rem;
+}
+
+h1 {
+  margin-bottom: 2rem;
+}
+
+button {
+  margin-bottom: 2rem;
+}
+
+.MuiAccordion-root {
+  margin-bottom: 1rem;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+li {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #ddd;
+}
+
+li:last-child {
+  border-bottom: none;
+}
+
+.calendar-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 2rem;
+}
+
+.fetch-button {
+  margin-top: 1rem;
+}
+
+.grid-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 2rem;
+}

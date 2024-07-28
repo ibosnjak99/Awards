@@ -14,19 +14,31 @@ namespace Application.Services
         private readonly IAwardsRepository awardsRepository;
         private readonly IUsersRepository usersRepository;
         private readonly IUserFinancesRepository userFinancesRepository;
+        private readonly IWinnersRepository winnersRepository;
         private readonly IMapper mapper;
         private readonly ILogger logger;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AwardsService"/> class.
+        /// </summary>
+        /// <param name="awardsRepository">The awards repository.</param>
+        /// <param name="usersRepository">The users repository.</param>
+        /// <param name="userFinancesRepository">The user finances repository.</param>
+        /// <param name="winnersRepository">The winners repository.</param>
+        /// <param name="mapper">The mapper.</param>
+        /// <param name="logger">The logger.</param>
         public AwardsService(
             IAwardsRepository awardsRepository,
             IUsersRepository usersRepository,
             IUserFinancesRepository userFinancesRepository,
+            IWinnersRepository winnersRepository,
             IMapper mapper,
             ILogger logger)
         {
             this.awardsRepository = awardsRepository;
             this.usersRepository = usersRepository;
             this.userFinancesRepository = userFinancesRepository;
+            this.winnersRepository = winnersRepository;
             this.mapper = mapper;
             this.logger = logger;
         }
@@ -35,6 +47,7 @@ namespace Application.Services
         /// <param name="awardDto">The award dto.</param>
         public async Task CreateAwardAsync(AwardCreateDto awardDto)
         {
+            awardDto.StartDate = DateTime.Now;
             var award = this.mapper.Map<Award>(awardDto);
 
             switch (award.PeriodType)
@@ -83,7 +96,7 @@ namespace Application.Services
 
         /// <summary>Gets the total award amount by date asynchronous.</summary>
         /// <param name="date">The date.</param>
-        public async Task<decimal> GetTotalAwardAmountByDateAsync(DateTime date)
+        public async Task<decimal> GetTotalAwardAmountByDateAsync(DateOnly date)
         {
             return await awardsRepository.GetTotalAwardAmountByDateAsync(date);
         }
@@ -104,7 +117,7 @@ namespace Application.Services
                 switch (award.PeriodType)
                 {
                     case PeriodType.Hourly:
-                        nextDistributionDate = award.StartDate.AddHours(1);
+                        nextDistributionDate = award.StartDate.AddSeconds(30);
                         if (currentTime >= nextDistributionDate)
                         {
                             isTimeToDistribute = true;
@@ -135,8 +148,7 @@ namespace Application.Services
 
                 if (isTimeToDistribute)
                 {
-                    var users = await this.usersRepository.GetAllUsersAsync();
-                    var randomUser = users.OrderBy(x => Guid.NewGuid()).FirstOrDefault();
+                    var randomUser = await this.usersRepository.GetRandomUserAsync();
 
                     if (randomUser != null)
                     {
@@ -145,6 +157,14 @@ namespace Application.Services
                         {
                             randomUserFinance.Balance += award.Amount;
                             await userFinancesRepository.UpdateBalanceAsync(randomUserFinance);
+
+                            var winner = new Winner
+                            {
+                                UserId = randomUser.PID,
+                                AwardId = award.Id,
+                                DateTimeAwarded = DateTime.Now
+                            };
+                            await this.winnersRepository.AddWinnerAsync(winner);
                         }
                     }
 
@@ -157,6 +177,17 @@ namespace Application.Services
                     this.logger.Information("Distributed {Amount} award to user {UserId}", award.Amount, randomUser?.PID);
                 }
             }
+        }
+
+        /// <summary>Gets the latest winner for specific award.</summary>
+        /// <param name="awardId">The award identifier.</param>
+        /// <returns>
+        /// The user dto.
+        /// </returns>
+        public async Task<UserDto> GetLatestWinnerForSpecifiedAward(int awardId)
+        {
+            var user = await this.awardsRepository.GetLatestWinnerForSpecifiedAward(awardId);
+            return this.mapper.Map<UserDto>(user);
         }
     }
 }

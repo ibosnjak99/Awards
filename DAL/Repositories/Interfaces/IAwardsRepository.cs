@@ -1,4 +1,5 @@
-﻿using Domain.Models;
+﻿using Domain;
+using Domain.Models;
 
 namespace DAL.Repositories.Interfaces
 {
@@ -28,12 +29,17 @@ namespace DAL.Repositories.Interfaces
         /// Gets the total award amount by date asynchronous.
         /// </summary>
         /// <param name="date">The date.</param>
-        Task<decimal> GetTotalAwardAmountByDateAsync(DateTime date);
+        Task<decimal> GetTotalAwardAmountByDateAsync(DateOnly date);
 
         /// <summary>
         /// Sets the award to finished asynchronous.
         /// </summary>
         /// <param name="awardId">The award identifier.</param>
-        Task SetAwardToFinishedAsync(int awardId);   
+        Task SetAwardToFinishedAsync(int awardId);
+
+        /// <summary>Gets the latest winner for specific award.</summary>
+        /// <param name="awardId">The award identifier.</param>
+        /// <returns>The user.</returns>
+        Task<User> GetLatestWinnerForSpecifiedAward(int awardId);
     }
 }
