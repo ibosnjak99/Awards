@@ -2,6 +2,7 @@
 using Dapper;
 using Domain;
 using Domain.Models;
+using Microsoft.Extensions.Caching.Memory;
 using Serilog;
 using System.Data;
 using System.Data.Common;
@@ -15,14 +16,16 @@ namespace DAL
     {
         private readonly IDbConnection dbConnection;
         private readonly ILogger logger;
+        private readonly IMemoryCache cache;
 
         /// <summary>Initializes a new instance of the <see cref="UsersRepository" /> class.</summary>
         /// <param name="dbConnection">The database connection.</param>
         /// <param name="logger">The logger.</param>
-        public UsersRepository(IDbConnection dbConnection, ILogger logger)
+        public UsersRepository(IDbConnection dbConnection, ILogger logger, IMemoryCache cache)
         {
             this.dbConnection = dbConnection;
             this.logger = logger;
+            this.cache = cache;
         }
 
         /// <summary>
@@ -77,19 +80,30 @@ namespace DAL
         /// <returns>All users.</returns>
         public async Task<IEnumerable<User>> GetAllUsersAsync()
         {
-            try
+            var cacheKey = "Users:All";
+            if (!cache.TryGetValue(cacheKey, out IEnumerable<User> cachedUsers))
             {
-                var sql = "SELECT * FROM Users";
-                var users = await dbConnection.QueryAsync<User>(sql);
+                try
+                {
+                    var sql = "SELECT * FROM Users";
+                    var users = await dbConnection.QueryAsync<User>(sql);
+                    cachedUsers = users.ToList();
 
-                this.logger.Information("Retrieved all users");
-                return users;
+                    if (cachedUsers.Any())
+                    {
+                        cache.Set(cacheKey, cachedUsers, TimeSpan.FromDays(1));
+                    }
+
+                    this.logger.Information("Retrieved all users");
+                }
+                catch (Exception ex)
+                {
+                    this.logger.Error(ex, "Error retrieving all users");
+                    throw;
+                }
             }
-            catch (Exception ex)
-            {
-                this.logger.Error(ex, "Error retrieving all users");
-                throw;
-            }
+
+            return cachedUsers;
         }
 
         /// <summary>
@@ -136,18 +150,20 @@ namespace DAL
         /// </returns>
         public async Task<IEnumerable<User>> GetUsersByRegistrationDateAsync(DateTime date)
         {
-            try
+            var cacheKey = $"Users:RegistrationDate:{date:yyyy-MM-dd}";
+            if (!cache.TryGetValue(cacheKey, out IEnumerable<User> cachedUsers))
             {
                 var sql = "SELECT * FROM Users WHERE CAST(RegistrationDate AS DATE) = CAST(@Date AS DATE)";
                 var users = await dbConnection.QueryAsync<User>(sql, new { Date = date });
-                this.logger.Information("Retrieved users with registration date {Date}", date);
-                return users;
+                cachedUsers = users.ToList();
+
+                if (cachedUsers.Any())
+                {
+                    cache.Set(cacheKey, cachedUsers, TimeSpan.FromDays(1));
+                }
             }
-            catch (Exception ex)
-            {
-                this.logger.Error(ex, "Error retrieving users with registration date {Date}", date);
-                throw;
-            }
+
+            return cachedUsers;
         }
     }
 }
