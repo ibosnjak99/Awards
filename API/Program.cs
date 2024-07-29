@@ -44,6 +44,7 @@ builder.Services.AddScoped<IDbConnection>(sp =>
 
 builder.Services.AddSingleton<IHostedService, PeriodicAwardService>();
 builder.Services.AddScoped<IValidator<RegisterUserDto>, UserValidator>();
+builder.Services.AddMemoryCache();
 
 var app = builder.Build();
 
