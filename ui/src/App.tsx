@@ -13,8 +13,8 @@ import Tab from '@mui/material/Tab';
 import { fetchAwardsByType, fetchUsersByRegistrationDate, fetchLatestWinnerForAward, getTotalAwardAmountByDate } from './client';
 import { UserDto, AwardDto } from './types';
 import './App.css';
-import RegisterForm from './RegisterForm';
-import CreateAwardForm from './CreateAwardForm';
+import RegisterForm from './components/RegisterForm';
+import CreateAwardForm from './components/CreateAwardForm';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 

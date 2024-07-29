@@ -12,8 +12,8 @@ import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
-import { createAward } from './client';
-import { AwardCreateDto } from './types';
+import { createAward } from '../client';
+import { AwardCreateDto } from '../types';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 

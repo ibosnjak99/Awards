@@ -35,7 +35,7 @@ namespace Application.BackgroundServices
         public Task StartAsync(CancellationToken cancellationToken)
         {
             this.logger.Information("Starting distributing periodic awards.");
-            timer = new Timer(DistributeAwards, null, TimeSpan.Zero, TimeSpan.FromSeconds(10));
+            timer = new Timer(DistributeAwards, null, TimeSpan.Zero, TimeSpan.FromMinutes(1));
             return Task.CompletedTask;
         }
 
